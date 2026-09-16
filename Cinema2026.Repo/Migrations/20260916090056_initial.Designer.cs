@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cinema2026.Repo.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20260915081551_initial")]
+    [Migration("20260916090056_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -23,6 +23,30 @@ namespace Cinema2026.Repo.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Cinema2026.Repo.Models.Movie", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("genre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Movies");
+                });
 
             modelBuilder.Entity("Cinema2026.Repo.Models.Person", b =>
                 {

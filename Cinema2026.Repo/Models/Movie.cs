@@ -8,6 +8,7 @@ namespace Cinema2026.Repo.Models
     {
         public int Id { get; set; } // variable / property
         public string title { get; set; }
-        public int year { get; set; 
+        public int year { get; set; }
+        public string genre { get; set; }
     }
 }

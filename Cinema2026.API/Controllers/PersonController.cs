@@ -14,21 +14,22 @@ namespace Cinema2026.API.Controllers
         // this class uses Repository. to do so we instance an objec
         // variable of type PersonRepositories
 
-        IPersonRepositories personRepo;// = new PersonRepositories();
-        public PersonController(IPersonRepositories r)
+        //IPersonRepositories personRepo;// = new PersonRepositories();
+        IGenericRepository<Person> genericRepo;
+        public PersonController(IGenericRepository<Person> r)
         {
-            personRepo = r;
+            genericRepo = r;
         }
 
         [HttpGet]
         public async Task<List<Person>> GetPersons()
         {
-            return await personRepo.GetPersonsFromDb();
+            return await genericRepo.GetAll();
         }
         [HttpDelete]
         public async Task DeletePerson(int id)
         {
-            await personRepo.Delete(id);
+            await genericRepo.Delete(id);
         }
         
 
@@ -85,7 +86,7 @@ namespace Cinema2026.API.Controllers
         [HttpPost]
         public async Task<Person> Post([FromBody] Person person)
         {
-            var created = await personRepo.CreatePerson(person);
+            var created = await genericRepo.Add(person);
             return created;
         }
 

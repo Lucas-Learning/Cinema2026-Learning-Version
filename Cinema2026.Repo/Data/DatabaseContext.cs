@@ -9,6 +9,10 @@ namespace Cinema2026.Repo.Data
 {
     public class DatabaseContext : DbContext
     {
+
+        //DETTE SKAL MAN GØR HVER GANG MAN TILFØJER EN NY CONTROLLER. HUSK OGSÅ AT SLET DATABASEN,MIGRATION FOLDER
+        //HVIS DEN ALLEREDE FINDES.
+
         //add-migration name
         //update-database
 
@@ -19,6 +23,7 @@ namespace Cinema2026.Repo.Data
         : base(options) { }
 
         public DbSet<Person> Persons { get; set; }
+        public DbSet<Movie> Movies { get; set; }
 
 
     }
