@@ -10,5 +10,8 @@ namespace Cinema2026.Repo.Models
         public string title { get; set; }
         public int year { get; set; }
         public string genre { get; set; }
+
+        public string? Description { get; set; }
+        public string? AgeRating { get; set; }
     }
 }

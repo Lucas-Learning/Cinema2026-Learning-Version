@@ -7,9 +7,9 @@ namespace Cinema2026.Repo.Models
     public class Ticket
     {
         public int Id { get; set; }
-        public int SeatId { get; set; } // foreign key
-        public int MovieId { get; set; }
-        public int PersonId { get; set; } // foreign key
+        public int MovieId { get; set; }  // FK -> Movie
+        public int SeatId { get; set; }   // FK -> Seat
+        public int PersonId { get; set; } // FK -> Person
         public decimal price { get; set; }
         public DateTime PurchaseDate { get; set; }
     }

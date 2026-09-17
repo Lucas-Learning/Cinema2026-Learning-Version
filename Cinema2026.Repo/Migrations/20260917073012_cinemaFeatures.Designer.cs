@@ -4,6 +4,7 @@ using Cinema2026.Repo.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cinema2026.Repo.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260917073012_cinemaFeatures")]
+    partial class cinemaFeatures
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -118,6 +121,31 @@ namespace Cinema2026.Repo.Migrations
                     b.ToTable("Seats");
                 });
 
+            modelBuilder.Entity("Cinema2026.Repo.Models.Showtime", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("HallId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("StartsAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Showtimes");
+                });
+
             modelBuilder.Entity("Cinema2026.Repo.Models.Ticket", b =>
                 {
                     b.Property<int>("Id")
@@ -126,9 +154,6 @@ namespace Cinema2026.Repo.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
-
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
 
@@ -136,6 +161,9 @@ namespace Cinema2026.Repo.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("SeatId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShowtimeId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("price")

@@ -1,8 +1,7 @@
-﻿using Cinema2026.Repo.Interfaces;
+﻿using Cinema2026.API.Dtos;
+using Cinema2026.Repo.Interfaces;
 using Cinema2026.Repo.Models;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Cinema2026.API.Controllers
 {
@@ -10,48 +9,67 @@ namespace Cinema2026.API.Controllers
     [ApiController]
     public class TicketsController : ControllerBase
     {
+        // Fast billetpris.
+        const decimal TicketPrice = 95m;
+
         IGenericRepository<Ticket> genericRepo;
         public TicketsController(IGenericRepository<Ticket> r)
         {
             genericRepo = r;
         }
-        // GET: api/<TicketsController>
+
+        // GET: api/Tickets              -> alle billetter
+        // GET: api/Tickets?movieId=1    -> billetter til en bestemt film
         [HttpGet]
-        public async Task<Ticket> GetTicketByOrderId(int orderId)
+        public async Task<List<Ticket>> GetTickets([FromQuery] int? movieId)
         {
-            var ticket = await genericRepo.GetById(orderId);
-            return ticket != null ? ticket : null;
+            var tickets = await genericRepo.GetAll();
+            if (movieId.HasValue)
+            {
+                tickets = tickets.Where(t => t.MovieId == movieId.Value).ToList();
+            }
+            return tickets;
         }
+
+        // GET: api/Tickets/5  -> én billet + 404
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Ticket>> GetTicketById(int id)
+        {
+            var ticket = await genericRepo.GetById(id);
+            if (ticket == null) return NotFound();
+            return ticket;
+        }
+
+        // POST api/Tickets   body: { movieId, seatId, personId }
         [HttpPost]
-        public async Task<Ticket> PostTicket([FromBody] Ticket ticket)
+        public async Task<ActionResult<Ticket>> PostTicket([FromBody] CreateTicketDto dto)
         {
+            // Samme sæde kan ikke bookes to gange til samme film.
+            var existing = await genericRepo.GetAll();
+            bool seatTaken = existing.Any(t => t.MovieId == dto.MovieId && t.SeatId == dto.SeatId);
+            if (seatTaken) return Conflict("Sædet er allerede booket til denne film.");
+
+            var ticket = new Ticket
+            {
+                MovieId = dto.MovieId,
+                SeatId = dto.SeatId,
+                PersonId = dto.PersonId,
+                price = TicketPrice,
+                PurchaseDate = DateTime.Now,
+            };
+
             var created = await genericRepo.Add(ticket);
-            return created;
+            return CreatedAtAction(nameof(GetTicketById), new { id = created.Id }, created);
         }
 
-        //// GET api/<TicketsController>/5
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
-
-        //// POST api/<TicketsController>
-        //[HttpPost]
-        //public void Post([FromBody] string value)
-        //{
-        //}
-
-        //// PUT api/<TicketsController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        //// DELETE api/<TicketsController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
+        // DELETE api/Tickets/5  -> annullér booking
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTicket(int id)
+        {
+            var ticket = await genericRepo.GetById(id);
+            if (ticket == null) return NotFound();
+            await genericRepo.Delete(id);
+            return NoContent();
+        }
     }
 }
