@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cinema2026.Repo.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20260916090056_initial")]
+    [Migration("20260916185028_initial")]
     partial class initial
     {
         /// <inheritdoc />

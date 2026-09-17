@@ -26,6 +26,12 @@ namespace Cinema2026.API.Controllers
         {
             return await genericRepo.GetAll();
         }
+        [HttpGet("{id}")]
+        public async Task<List<Person>> GetPersonById(int id)
+        {
+            var person = await genericRepo.GetById(id);
+            return person != null ? new List<Person> { person } : new List<Person>();
+        }
         [HttpDelete]
         public async Task DeletePerson(int id)
         {

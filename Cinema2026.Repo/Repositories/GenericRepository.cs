@@ -20,6 +20,14 @@ namespace Cinema2026.Repo.Repositories
         {
             return await _context.Set<T>().ToListAsync();
         }
+        public async Task<T?> GetById(int id)
+        {
+            if (id <= 0)
+            {
+                throw new ArgumentException("Invalid ID");
+            }
+            return await _context.Set<T>().FindAsync(id);
+        }
         public async Task<T> Add(T entity)
         {
             _context.Set<T>().Add(entity);

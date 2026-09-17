@@ -22,6 +22,12 @@ namespace Cinema2026.API.Controllers
         {
             return await genericRepo.GetAll();
         }
+        [HttpGet("{id}")]
+        public async Task<List<Movie>> GetMovieById(int id)
+        {
+            var movie = await genericRepo.GetById(id);
+            return movie != null ? new List<Movie> { movie } : new List<Movie>(); //Cheks if movie is null, if it is null returns an empty list, if not returns a list with the movie
+        }
 
         // POST api/<MoviesController>
         [HttpPost]

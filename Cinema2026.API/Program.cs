@@ -19,6 +19,15 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("VoresDatabase")));
 
 //builder.Services.AddScoped<IPersonRepositories, PersonRepositories>();
+//allow the Angular dev server to call the API.
+const string AngularCorsPolicy = "AngularDev";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(AngularCorsPolicy, policy =>
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 //builder.Services.AddScoped<Interface,class> ();
 
