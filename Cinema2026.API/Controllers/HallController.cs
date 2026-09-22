@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Cinema2026.API.Controllers
 {
+    // URL: /api/Hall — en sal indeholder de sæder man kan booke.
     [Route("api/[controller]")]
     [ApiController]
     public class HallController : ControllerBase

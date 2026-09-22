@@ -7,6 +7,8 @@ using System.Text;
 
 namespace Cinema2026.Repo.Data
 {
+    // DatabaseContext er bindeleddet mellem C#-koden og SQL-databasen.
+    // Hver DbSet<T> herunder svarer til én tabel i databasen.
     public class DatabaseContext : DbContext
     {
 
@@ -19,9 +21,14 @@ namespace Cinema2026.Repo.Data
         // EF core fejl =>
         // slet Migration mappe
         // slet database og vinke af slet forbindelse (keep alive)
+
+        // Options (bl.a. connection string) kommer udefra fra Program.cs,
+        // så klassen ikke selv skal vide hvor databasen ligger.
         public DatabaseContext(DbContextOptions<DatabaseContext> options)
         : base(options) { }
 
+        // VIGTIGT: en model uden en DbSet her findes ikke for EF Core.
+        // Det var præcis derfor Tickets crashede, før Tickets-linjen blev tilføjet.
         public DbSet<Person> Persons { get; set; }
         public DbSet<Movie> Movies { get; set; }
         public DbSet<Seat> Seats { get; set; }

@@ -5,13 +5,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Cinema2026.API.Controllers
 {
+    // [Route] bestemmer URL'en: [controller] bliver til "Tickets" -> /api/Tickets
+    // [ApiController] giver bl.a. automatisk validering af input.
     [Route("api/[controller]")]
     [ApiController]
     public class TicketsController : ControllerBase
     {
         // Fast billetpris.
+        // Ligger på serveren, så en klient ikke selv kan bestemme prisen.
         const decimal TicketPrice = 95m;
 
+        // Repository'et kommer ind via constructoren (Dependency Injection).
         IGenericRepository<Ticket> genericRepo;
         public TicketsController(IGenericRepository<Ticket> r)
         {
@@ -20,10 +24,12 @@ namespace Cinema2026.API.Controllers
 
         // GET: api/Tickets              -> alle billetter
         // GET: api/Tickets?movieId=1    -> billetter til en bestemt film
+        // Frontend bruger filteret til at vide hvilke sæder der er optaget.
         [HttpGet]
         public async Task<List<Ticket>> GetTickets([FromQuery] int? movieId)
         {
             var tickets = await genericRepo.GetAll();
+            // int? (nullable) gør parameteren valgfri: uden den får man alle.
             if (movieId.HasValue)
             {
                 tickets = tickets.Where(t => t.MovieId == movieId.Value).ToList();
@@ -36,19 +42,25 @@ namespace Cinema2026.API.Controllers
         public async Task<ActionResult<Ticket>> GetTicketById(int id)
         {
             var ticket = await genericRepo.GetById(id);
+            // ActionResult gør det muligt at svare med en statuskode i stedet for data.
             if (ticket == null) return NotFound();
             return ticket;
         }
 
         // POST api/Tickets   body: { movieId, seatId, personId }
+        // Vi tager imod en DTO i stedet for en hel Ticket, så klienten ikke kan
+        // sende sin egen pris eller sit eget Id.
         [HttpPost]
         public async Task<ActionResult<Ticket>> PostTicket([FromBody] CreateTicketDto dto)
         {
             // Samme sæde kan ikke bookes to gange til samme film.
             var existing = await genericRepo.GetAll();
             bool seatTaken = existing.Any(t => t.MovieId == dto.MovieId && t.SeatId == dto.SeatId);
+            // 409 Conflict betyder "det kan ikke lade sig gøre lige nu" — frontend
+            // viser så en besked om at vælge et andet sæde.
             if (seatTaken) return Conflict("Sædet er allerede booket til denne film.");
 
+            // Pris og dato sættes her på serveren — aldrig af klienten.
             var ticket = new Ticket
             {
                 MovieId = dto.MovieId,
@@ -59,6 +71,7 @@ namespace Cinema2026.API.Controllers
             };
 
             var created = await genericRepo.Add(ticket);
+            // 201 Created + hvor den nye billet kan hentes henne.
             return CreatedAtAction(nameof(GetTicketById), new { id = created.Id }, created);
         }
 
@@ -69,6 +82,7 @@ namespace Cinema2026.API.Controllers
             var ticket = await genericRepo.GetById(id);
             if (ticket == null) return NotFound();
             await genericRepo.Delete(id);
+            // 204 NoContent = det lykkedes, men der er ikke noget at sende tilbage.
             return NoContent();
         }
     }

@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Cinema2026.Repo.Interfaces;
 using Cinema2026.Repo.Models;
 
 namespace Cinema2026.API.Controllers
 {
+    // URL: /api/Movie. Controlleren tager imod HTTP-kald og bruger repository'et
+    // til at hente/gemme data — selve database-koden ligger altså ikke her.
     [Route("api/[controller]")]
     [ApiController]
     public class MovieController : ControllerBase
     {
+        // Controlleren kender kun interfacet, ikke databasen (løs kobling).
         IGenericRepository<Movie> genericRepo;
         public MovieController(IGenericRepository<Movie> r)
         {
@@ -23,6 +26,7 @@ namespace Cinema2026.API.Controllers
 
         // GET: api/Movie/5  -> ét objekt + 404
         // actionresult return type is used to return a 404 if the object is not found
+        // {id} i ruten betyder at værdien læses fra selve URL'en.
         [HttpGet("{id}")]
         public async Task<ActionResult<Movie>> GetMovieById(int id)
         {
@@ -32,6 +36,7 @@ namespace Cinema2026.API.Controllers
         }
 
         // POST api/Movie
+        // [FromBody] = filmen sendes som JSON i request-bodyen.
         [HttpPost]
         public async Task<Movie> Post([FromBody] Movie movie)
         {
@@ -40,6 +45,7 @@ namespace Cinema2026.API.Controllers
         }
 
         // DELETE api/Movie?id=5
+        // Her læses id fra query-strengen (?id=5), ikke fra ruten.
         [HttpDelete]
         public async Task DeleteMovie(int id)
         {

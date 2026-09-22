@@ -4,10 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Cinema2026.API.Controllers
 {
+    // URL: /api/Seats
     [Route("api/[controller]")]
     [ApiController]
     public class SeatsController : ControllerBase
     {
+        // Samme generiske repository som de andre controllers — bare med Seat som type.
         IGenericRepository<Seat> genericRepo;
         public SeatsController(IGenericRepository<Seat> r)
         {
@@ -20,6 +22,7 @@ namespace Cinema2026.API.Controllers
         public async Task<List<Seat>> GetSeats([FromQuery] int? hallId)
         {
             var seats = await genericRepo.GetAll();
+            // Valgfrit filter: uden hallId får man alle sæder.
             if (hallId.HasValue)
             {
                 seats = seats.Where(s => s.HallId == hallId.Value).ToList();
@@ -28,6 +31,8 @@ namespace Cinema2026.API.Controllers
         }
 
         // GET: api/Seats/5  -> ét sæde + 404
+        // 404 er bedre end at returnere null, fordi klienten så tydeligt kan se
+        // forskel på "findes ikke" og "fandtes, men var tom".
         [HttpGet("{id}")]
         public async Task<ActionResult<Seat>> GetSeatById(int id)
         {
