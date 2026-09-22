@@ -72,6 +72,8 @@ namespace Cinema2026.API.Controllers
 
             var created = await genericRepo.Add(ticket);
             // 201 Created + hvor den nye billet kan hentes henne.
+            // nameof(GetTicketById) giver metodens navn som tekst — så det følger med,
+            // hvis metoden en dag omdøbes (i stedet for at skrive "GetTicketById" direkte).
             return CreatedAtAction(nameof(GetTicketById), new { id = created.Id }, created);
         }
 

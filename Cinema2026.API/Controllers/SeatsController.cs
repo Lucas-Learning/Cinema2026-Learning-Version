@@ -23,6 +23,8 @@ namespace Cinema2026.API.Controllers
         {
             var seats = await genericRepo.GetAll();
             // Valgfrit filter: uden hallId får man alle sæder.
+            // .Where(...) er LINQ og beholder kun de elementer hvor betingelsen er sand.
+            // "s => s.HallId == ..." er en lambda — en kort, unavngiven funktion.
             if (hallId.HasValue)
             {
                 seats = seats.Where(s => s.HallId == hallId.Value).ToList();

@@ -6,6 +6,9 @@ namespace Cinema2026.API.Controllers
 {
     // URL: /api/Movie. Controlleren tager imod HTTP-kald og bruger repository'et
     // til at hente/gemme data — selve database-koden ligger altså ikke her.
+    // [controller] i [Route] bliver automatisk til klassens navn uden "Controller" (altså "Movie").
+    // [ApiController] slår bl.a. automatisk validering af input til.
+    // ControllerBase giver adgang til hjælpe-metoder som NotFound() og CreatedAtAction().
     [Route("api/[controller]")]
     [ApiController]
     public class MovieController : ControllerBase
@@ -18,6 +21,8 @@ namespace Cinema2026.API.Controllers
         }
 
         // GET: api/Movie
+        // async Task<T>: metoden kører asynkront (venter ikke og blokerer serveren)
+        // og ender med at levere en List<Movie>, når databasekaldet er færdigt.
         [HttpGet]
         public async Task<List<Movie>> GetAll()
         {
