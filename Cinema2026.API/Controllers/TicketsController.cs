@@ -24,15 +24,20 @@ namespace Cinema2026.API.Controllers
 
         // GET: api/Tickets              -> alle billetter
         // GET: api/Tickets?movieId=1    -> billetter til en bestemt film
-        // Frontend bruger filteret til at vide hvilke sæder der er optaget.
+        // GET: api/Tickets?personId=2   -> én kundes billetter ("Mine billetter")
+        // Frontend bruger movieId-filteret til at vide hvilke sæder der er optaget.
         [HttpGet]
-        public async Task<List<Ticket>> GetTickets([FromQuery] int? movieId)
+        public async Task<List<Ticket>> GetTickets([FromQuery] int? movieId, [FromQuery] int? personId)
         {
             var tickets = await genericRepo.GetAll();
-            // int? (nullable) gør parameteren valgfri: uden den får man alle.
+            // int? (nullable) gør parametrene valgfrie: uden dem får man alle.
             if (movieId.HasValue)
             {
                 tickets = tickets.Where(t => t.MovieId == movieId.Value).ToList();
+            }
+            if (personId.HasValue)
+            {
+                tickets = tickets.Where(t => t.PersonId == personId.Value).ToList();
             }
             return tickets;
         }
