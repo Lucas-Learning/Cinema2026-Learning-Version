@@ -1,3 +1,4 @@
+using Cinema2026.API.Helpers;
 using Cinema2026.Repo.Data;
 using Cinema2026.Repo.Interfaces;
 using Cinema2026.Repo.Models;
@@ -60,6 +61,20 @@ using (var scope = app.Services.CreateScope())
         var admin = new Person { name = "Josef", age = 25, Username = "josef", IsAdmin = true };
         admin.PasswordHash = new PasswordHasher<Person>().HashPassword(admin, "1234");
         db.Persons.Add(admin);
+        db.SaveChanges();
+    }
+
+    // Seed 2: film uden sal (oprettet før "automatisk sal" fandtes) får en
+    // standard-sal, så de også kan bookes. Nye film får salen i MovieController.
+    // .ToList() henter listen færdig, før vi begynder at ændre i databasen.
+    foreach (var movie in db.Movies.Where(m => m.HallId == null).ToList())
+    {
+        var hall = StandardHall.NewHall(movie.title);
+        db.Halls.Add(hall);
+        db.SaveChanges(); // gem salen først, så hall.id bliver sat
+
+        db.Seats.AddRange(StandardHall.NewSeats(hall.id));
+        movie.HallId = hall.id;
         db.SaveChanges();
     }
 }

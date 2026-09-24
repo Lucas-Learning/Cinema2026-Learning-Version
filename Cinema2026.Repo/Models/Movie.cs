@@ -18,5 +18,10 @@ namespace Cinema2026.Repo.Models
         // gamle film i databasen ikke skal have dem udfyldt.
         public string? Description { get; set; }
         public string? AgeRating { get; set; }
+
+        // Den sal filmen vises i (FK -> Hall). Sættes automatisk når filmen oprettes.
+        // Nullable, så film oprettet FØR denne funktion ikke fejler — seed'en i
+        // Program.cs giver dem en sal ved næste opstart.
+        public int? HallId { get; set; }
     }
 }
