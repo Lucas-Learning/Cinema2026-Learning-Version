@@ -24,5 +24,9 @@ namespace Cinema2026.Repo.Models
         // af de eksisterende Person-endpoints hashen.
         [JsonIgnore]
         public string? PasswordHash { get; set; }
+
+        // Admin-flag: kun admins kan komme ind på /admin i frontend. Det kan ikke
+        // sættes via register (det er ikke med i RegisterDto) — kun via seed'en i Program.cs.
+        public bool IsAdmin { get; set; }
     }
 }

@@ -1,6 +1,8 @@
 using Cinema2026.Repo.Data;
 using Cinema2026.Repo.Interfaces;
+using Cinema2026.Repo.Models;
 using Cinema2026.Repo.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata;
 
@@ -44,6 +46,23 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 //builder.Services.AddScoped<Interface,class> ();
 
 var app = builder.Build();
+
+// Seed: sørg for at der altid findes en admin-bruger (josef / 1234), så man kan
+// komme ind på /admin. Koden kører hver gang API'et starter, men opretter kun
+// brugeren, hvis den mangler — så den laver aldrig dubletter.
+// DatabaseContext er "scoped" (én pr. HTTP-request). Her er vi UDEN FOR et request,
+// så vi laver selv et scope med CreateScope() for at kunne få fat i den.
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+    if (!db.Persons.Any(p => p.Username == "josef"))
+    {
+        var admin = new Person { name = "Josef", age = 25, Username = "josef", IsAdmin = true };
+        admin.PasswordHash = new PasswordHasher<Person>().HashPassword(admin, "1234");
+        db.Persons.Add(admin);
+        db.SaveChanges();
+    }
+}
 
 // Configure the HTTP request pipeline.
 // Swagger kun i udvikling — den skal ikke være offentlig i produktion.
