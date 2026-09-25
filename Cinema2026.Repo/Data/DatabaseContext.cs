@@ -1,4 +1,4 @@
-﻿using Cinema2026.Repo.Models;
+using Cinema2026.Repo.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols;
 using System;
@@ -34,6 +34,7 @@ namespace Cinema2026.Repo.Data
         public DbSet<Seat> Seats { get; set; }
         public DbSet<Hall> Halls { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
+        public DbSet<Screening> Screenings { get; set; }
 
 
     }

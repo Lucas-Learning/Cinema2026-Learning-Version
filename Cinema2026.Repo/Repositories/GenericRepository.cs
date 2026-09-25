@@ -13,6 +13,8 @@ namespace Cinema2026.Repo.Repositories
     // Fordi den er generisk (<T>), dækker denne ene klasse alle vores modeller.
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
+        // readonly = kan kun sættes i constructoren, så ingen kan bytte databasen ud senere.
+        // "_" foran navnet er en almindelig konvention for private felter.
         private readonly DatabaseContext _context;
 
         // Databasen kommer ind udefra (Dependency Injection) i stedet for at
@@ -33,6 +35,7 @@ namespace Cinema2026.Repo.Repositories
         {
             if (id <= 0)
             {
+                // throw stopper metoden med en fejl (exception), som kalderen kan fange.
                 throw new ArgumentException("Invalid ID");
             }
             // FindAsync slår op på primærnøglen. Returnerer null hvis den ikke findes.

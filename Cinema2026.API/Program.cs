@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(); // OpenAPI = maskinlæsbar beskrivelse af API'et (bruges af Swagger-siden)
 builder.Services.AddControllers(); // finder alle vores Controller-klasser
 
 // Swagger = testside hvor man kan kalde API'et uden en frontend.
@@ -46,6 +46,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 //builder.Services.AddScoped<Interface,class> ();
 
+// Build() "låser" opsætningen og laver selve appen. Herfra handler koden om,
+// hvad der sker med hvert request ("pipelinen").
 var app = builder.Build();
 
 // Seed: sørg for at der altid findes en admin-bruger (josef / 1234), så man kan
@@ -64,19 +66,23 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
     }
 
-    // Seed 2: film uden sal (oprettet før "automatisk sal" fandtes) får en
-    // standard-sal, så de også kan bookes. Nye film får salen i MovieController.
-    // .ToList() henter listen færdig, før vi begynder at ændre i databasen.
-    foreach (var movie in db.Movies.Where(m => m.HallId == null).ToList())
+    // Seed 2: sale og sæder. En sal uden sæder kan ikke bookes, så:
+    //  - findes der slet ingen sale, oprettes "Sal 1" og "Sal 2"
+    //  - alle sale uden sæder får standard-layoutet (A-C x 6)
+    // Nye sale oprettet via API'et får sæder med det samme (se HallController).
+    if (!db.Halls.Any())
     {
-        var hall = StandardHall.NewHall(movie.title);
-        db.Halls.Add(hall);
-        db.SaveChanges(); // gem salen først, så hall.id bliver sat
-
-        db.Seats.AddRange(StandardHall.NewSeats(hall.id));
-        movie.HallId = hall.id;
-        db.SaveChanges();
+        db.Halls.AddRange(new Hall { Name = "Sal 1" }, new Hall { Name = "Sal 2" });
+        db.SaveChanges(); // gem først, så salene får id'er
     }
+    foreach (var hall in db.Halls.ToList())
+    {
+        if (!db.Seats.Any(s => s.HallId == hall.id))
+        {
+            db.Seats.AddRange(StandardHall.NewSeats(hall.id));
+        }
+    }
+    db.SaveChanges();
 }
 
 // Configure the HTTP request pipeline.
@@ -88,8 +94,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection(); // sender almindelige http-kald videre til https (krypteret)
 
 app.MapControllers(); // kobler URL'er som /api/Movie til vores controllers
 
-app.Run();
+app.Run(); // starter webserveren og venter på requests — koden "står her", til appen lukkes

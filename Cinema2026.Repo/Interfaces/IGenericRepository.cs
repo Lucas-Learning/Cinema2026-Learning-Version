@@ -10,6 +10,9 @@ namespace Cinema2026.Repo.Interfaces
     //
     // <T> betyder at den virker for enhver model (Movie, Seat, Ticket...),
     // så vi slipper for at skrive næsten ens repository-kode for hver model.
+    // "where T : class" = T skal være en klasse (vores modeller) — ikke fx et tal.
+    // Task = et "løfte om et resultat senere" (asynkront): Task<List<T>> leverer
+    // listen, når databasen har svaret, uden at serveren står og venter imens.
     public interface IGenericRepository <T> where T : class
     {
         public Task<List<T>> GetAll();

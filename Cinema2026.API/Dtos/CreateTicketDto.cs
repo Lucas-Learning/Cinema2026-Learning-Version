@@ -6,7 +6,7 @@ namespace Cinema2026.API.Dtos
     // med vilje — dem sætter serveren selv, så de ikke kan forfalskes.
     public class CreateTicketDto
     {
-        public int MovieId { get; set; }
+        public int ScreeningId { get; set; } // hvilken afspilning (film + sal + tid)
         public int SeatId { get; set; }
         public int PersonId { get; set; }
     }

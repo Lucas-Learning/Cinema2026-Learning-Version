@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,6 +6,8 @@ namespace Cinema2026.Repo.Models
 {
     // En film. Klassen svarer til tabellen "Movies" i databasen,
     // og hver property svarer til en kolonne.
+    // En film har IKKE en sal — det er afspilningen (Screening), der kobler
+    // film + sal + tidspunkt. Samme film kan derfor vises i flere sale.
     public class Movie
     {
         // EF Core bruger automatisk en property der hedder Id som primærnøgle.
@@ -18,10 +20,5 @@ namespace Cinema2026.Repo.Models
         // gamle film i databasen ikke skal have dem udfyldt.
         public string? Description { get; set; }
         public string? AgeRating { get; set; }
-
-        // Den sal filmen vises i (FK -> Hall). Sættes automatisk når filmen oprettes.
-        // Nullable, så film oprettet FØR denne funktion ikke fejler — seed'en i
-        // Program.cs giver dem en sal ved næste opstart.
-        public int? HallId { get; set; }
     }
 }

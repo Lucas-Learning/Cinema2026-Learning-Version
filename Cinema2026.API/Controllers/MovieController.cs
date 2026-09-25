@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Cinema2026.API.Helpers;
 using Cinema2026.Repo.Interfaces;
 using Cinema2026.Repo.Models;
 
@@ -16,18 +15,9 @@ namespace Cinema2026.API.Controllers
     {
         // Controlleren kender kun interfacet, ikke databasen (løs kobling).
         IGenericRepository<Movie> genericRepo;
-        // Skal også kunne oprette sal + sæder, når en film oprettes.
-        IGenericRepository<Hall> hallRepo;
-        IGenericRepository<Seat> seatRepo;
-
-        public MovieController(
-            IGenericRepository<Movie> r,
-            IGenericRepository<Hall> h,
-            IGenericRepository<Seat> s)
+        public MovieController(IGenericRepository<Movie> r)
         {
             genericRepo = r;
-            hallRepo = h;
-            seatRepo = s;
         }
 
         // GET: api/Movie
@@ -52,32 +42,17 @@ namespace Cinema2026.API.Controllers
 
         // POST api/Movie
         // [FromBody] = filmen sendes som JSON i request-bodyen.
-        // Hver ny film får automatisk sin egen standard-sal med sæder,
-        // så den kan bookes med det samme.
+        // Filmen får ingen sal her — sal og tidspunkt sættes i en afspilning (Screening).
         [HttpPost]
         public async Task<Movie> Post([FromBody] Movie movie)
         {
             var created = await genericRepo.Add(movie);
-
-            // 1) Gem salen først, så den får et id ...
-            var hall = await hallRepo.Add(StandardHall.NewHall(created.title));
-
-            // 2) ... som sæderne kan pege på.
-            foreach (var seat in StandardHall.NewSeats(hall.id))
-            {
-                await seatRepo.Add(seat);
-            }
-
-            // 3) Kobl salen på filmen.
-            created.HallId = hall.id;
-            await genericRepo.Update(created);
-
             return created;
         }
 
         // DELETE api/Movie?id=5
         // Her læses id fra query-strengen (?id=5), ikke fra ruten.
-        // Filmens sal og sæder bliver liggende — det er godt nok til projektet.
+        // Filmens afspilninger bliver liggende — det er godt nok til projektet.
         [HttpDelete]
         public async Task DeleteMovie(int id)
         {
